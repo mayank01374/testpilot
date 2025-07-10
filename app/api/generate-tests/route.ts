@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
-
 export async function POST(req: NextRequest) {
   const { code } = await req.json();
 
@@ -51,6 +47,14 @@ ${langHint}
 Output only raw, valid ${languageName} code which was given by the user as it is without any changes follwed by the test cases in that language— no explanations, no markdown, no comments, no extra phrases.
 `;
 
+  // Move GROQ_API_KEY access and Groq client instantiation here
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
+  if (!GROQ_API_KEY) {
+    throw new Error("GROQ_API_KEY environment variable is missing or empty; either provide it, or instantiate the Groq client with an apiKey option, like new Groq({ apiKey: 'My API Key' }).");
+  }
+  const groq = new Groq({
+    apiKey: GROQ_API_KEY,
+  });
 
   try {
     const result = await groq.chat.completions.create({
@@ -63,8 +67,8 @@ Output only raw, valid ${languageName} code which was given by the user as it is
 
     const generated = result.choices?.[0]?.message?.content || "// No test cases generated.";
     return NextResponse.json({ generated });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Groq API Error:", err);
-    return NextResponse.json({ error: "Failed to generate test code", details: err.message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to generate test code", details: (err as Error).message }, { status: 500 });
   }
 } 

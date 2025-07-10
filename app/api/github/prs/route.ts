@@ -34,15 +34,15 @@ export async function GET() {
 
     const data = await res.json();
     // Map to only needed fields
-    const simplified = data.map((pr: any) => ({
-      number: pr.number,
-      title: pr.title,
+    const simplified = data.map((pr: unknown) => ({
+      number: (pr as any).number,
+      title: (pr as any).title,
     }));
 
     return NextResponse.json(simplified);
-  } catch (err: any) {
+  } catch (err: unknown) {
     return NextResponse.json(
-      { error: "Failed to fetch PRs", details: err.message },
+      { error: "Failed to fetch PRs", details: (err as Error).message },
       { status: 500 }
     );
   }

@@ -4,10 +4,6 @@ import { Octokit } from "@octokit/rest";
 import { createAppAuth } from "@octokit/auth-app";
 
 const WEBHOOK_SECRET = process.env.GITHUB_WEBHOOK_SECRET!;
-const PRIVATE_KEY = process.env.GITHUB_PRIVATE_KEY!.replace(/\\n/g, "\n");
-const APP_ID = process.env.GITHUB_APP_ID!;
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID!;
-const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET!;
 
 export async function POST(req: NextRequest) {
   const signature = req.headers.get("x-hub-signature-256");
@@ -28,6 +24,16 @@ export async function POST(req: NextRequest) {
     const { number: prNumber } = payload.pull_request;
     const repo = payload.repository.name;
     const owner = payload.repository.owner.login;
+
+    // Move secret access here
+    const rawPrivateKey = process.env.GITHUB_PRIVATE_KEY;
+    if (!rawPrivateKey) {
+      throw new Error("GITHUB_PRIVATE_KEY environment variable is not set.");
+    }
+    const PRIVATE_KEY = rawPrivateKey.replace(/\\n/g, "\n");
+    const APP_ID = process.env.GITHUB_APP_ID!;
+    const CLIENT_ID = process.env.GITHUB_CLIENT_ID!;
+    const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET!;
 
     const appOctokit = new Octokit({
       authStrategy: createAppAuth,

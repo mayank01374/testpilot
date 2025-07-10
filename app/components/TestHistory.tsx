@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useEffect, useState } from "react";
 import { TestRun } from "./types";
 import { toast } from "sonner";

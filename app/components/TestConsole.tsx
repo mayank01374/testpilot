@@ -1,4 +1,4 @@
-"use client";
+import React from "react";
 
 interface TestConsoleProps {
   output: string | null;

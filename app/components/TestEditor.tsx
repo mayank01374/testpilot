@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { TestRun } from "./types";
@@ -56,7 +57,7 @@ export default function TestEditor({
     try {
       const logs: string[] = [];
       const customConsole = {
-        log: (...args: any[]) => {
+        log: (...args: unknown[]) => {
           logs.push(args.join(" "));
         },
       };
@@ -73,8 +74,8 @@ export default function TestEditor({
       };
       saveToHistory(run);
       toast.success("Test ran successfully!");
-    } catch (err: any) {
-      const errorMessage = err.message;
+    } catch (err: unknown) {
+      const errorMessage = (err as Error).message;
       setError(errorMessage);
       setLocalError(errorMessage);
       const run: TestRun = {
